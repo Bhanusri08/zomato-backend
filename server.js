@@ -4,24 +4,22 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const path = require("path");
 const axios = require("axios");
-const FormData = require("form-data");
-
+const FormData = require("form-data"); // Required for sending images to Python API
+const dotenv = require("dotenv");
 const app = express();
 const port = process.env.PORT || 5000;
-
+dotenv.config();
 app.use(cors());
 app.use(express.json());
 
 // ✅ MongoDB Connection
-mongoose.connect("mongodb://127.0.0.1:27017/zomato_db", {
+mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  serverSelectionTimeoutMS: 0,  // Infinite timeout for server selection
-  socketTimeoutMS: 0,           // Infinite timeout for socket operations
-  connectTimeoutMS: 0,          // Infinite timeout for initial connection
 })
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch(err => console.error("❌ MongoDB Connection Error:", err));
+.then(() => console.log('✅ MongoDB Connected'))
+.catch(err => console.error('❌ MongoDB Connection Error:', err));
+
 // ✅ Define Restaurant Schema
 const RestaurantSchema = new mongoose.Schema({
   restaurant_id: Number,  // use restaurant_id for consistency
@@ -64,7 +62,6 @@ app.get("/api/restaurantss/:id", async (req, res) => {
       console.log("❌ No matching restaurant found.");
       return res.status(404).json({ message: "Restaurant Not Found" });
     }
-
     res.json(restaurant);
   } catch (error) {
     console.error("❌ Server Error:", error);
